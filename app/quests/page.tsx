@@ -19,6 +19,7 @@ interface Quest {
   completed: boolean
   progress: number
   total: number
+  claimed?: boolean
 }
 
 const leaderboardData: LeaderboardEntry[] = [
@@ -71,16 +72,6 @@ const questsData: Quest[] = [
     total: 100,
   },
   {
-    id: 5,
-    title: 'Viral Sensation',
-    description: 'Get your joke shared 20 times',
-    reward: 150,
-    icon: '🚀',
-    completed: false,
-    progress: 0,
-    total: 20,
-  },
-  {
     id: 6,
     title: 'Daily Dose',
     description: 'Submit a joke every day for a week',
@@ -90,12 +81,72 @@ const questsData: Quest[] = [
     progress: 0,
     total: 7,
   },
+  {
+    id: 7,
+    title: 'Meme Maestro',
+    description: 'Upload an image or GIF with your joke',
+    reward: 30,
+    icon: '🖼️',
+    completed: false,
+    progress: 0,
+    total: 1,
+  },
+  {
+    id: 8,
+    title: 'Share the Laughs',
+    description: 'Share a joke using the Share button',
+    reward: 20,
+    icon: '📤',
+    completed: false,
+    progress: 0,
+    total: 1,
+  },
+  {
+    id: 9,
+    title: 'Welcome Aboard',
+    description: 'Connect your wallet to get started',
+    reward: 5,
+    icon: '🔐',
+    completed: false,
+    progress: 0,
+    total: 1,
+  },
 ]
 
 export default function Quests() {
   const [activeTab, setActiveTab] = useState<'quests' | 'leaderboard'>('quests')
-  const [quests] = useState<Quest[]>(questsData)
+  const [quests, setQuests] = useState<Quest[]>(questsData)
   const { isConnected } = useAccount()
+
+  // Increment progress for a quest (simulate action)
+  const incrementProgress = (id: number, amount = 1) => {
+    setQuests((prev) =>
+      prev.map((q) => {
+        if (q.id !== id) return q
+        const newProgress = Math.min(q.total, q.progress + amount)
+        return {
+          ...q,
+          progress: newProgress,
+          completed: newProgress >= q.total,
+        }
+      })
+    )
+  }
+
+  const claimReward = (id: number) => {
+    setQuests((prev) =>
+      prev.map((q) => {
+        if (q.id !== id) return q
+        if (!q.completed || q.claimed) return q
+        // mark claimed
+        setTimeout(() => {
+          // small delay to simulate processing
+        }, 200)
+        alert(`🎉 Claimed +${q.reward} Punny Power for '${q.title}'`)
+        return { ...q, claimed: true }
+      })
+    )
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
@@ -186,9 +237,42 @@ export default function Quests() {
 
               {quest.completed && (
                 <div className="bg-fluorescent-green/20 border border-fluorescent-green rounded-lg p-3 text-center">
-                  <span className="text-fluorescent-green font-bold">
-                    🎉 Completed! +{quest.reward} Punny Power earned!
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-fluorescent-green font-bold">
+                      🎉 Completed! +{quest.reward} Punny Power earned!
+                    </span>
+                    {!quest.claimed ? (
+                      <button
+                        onClick={() => claimReward(quest.id)}
+                        className="ml-4 px-4 py-2 rounded-full bg-fluorescent-green text-black font-bold"
+                      >
+                        Claim
+                      </button>
+                    ) : (
+                      <span className="text-sm text-gray-300">Claimed</span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
+              {!quest.completed && (
+                <div className="flex items-center gap-4 mt-3">
+                  <button
+                    onClick={() => incrementProgress(quest.id, 1)}
+                    className="px-4 py-2 rounded-full bg-fluorescent-purple text-white font-bold"
+                  >
+                    Do it
+                  </button>
+                  <button
+                    onClick={() => incrementProgress(quest.id, quest.total)}
+                    className="px-4 py-2 rounded-full bg-black/40 border border-fluorescent-purple text-gray-200"
+                  >
+                    Complete (simulate)
+                  </button>
+                  {!isConnected && quest.title === 'Welcome Aboard' && (
+                    <span className="text-sm text-fluorescent-orange">Connect your wallet to complete this quest</span>
+                  )}
                 </div>
               )}
             </div>
