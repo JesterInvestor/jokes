@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useAppKit } from '@reown/appkit/react'
 import { useAccount } from 'wagmi'
 import { useRouter } from 'next/navigation'
+import { useAddJoke } from '../../lib/contractHelpers'
 
 export default function Write() {
   const [joke, setJoke] = useState('')
@@ -14,6 +15,7 @@ export default function Write() {
   const { open } = useAppKit()
   const { address, isConnected } = useAccount()
   const router = useRouter()
+  const { addJoke, isLoading: addLoading } = useAddJoke()
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -38,7 +40,6 @@ export default function Write() {
     if (!joke.trim()) {
       return
     }
-
     setIsSubmitting(true)
 
     // Play sound
@@ -48,12 +49,17 @@ export default function Write() {
       audio.play().catch(() => {})
     } catch (e) {}
 
-    // Simulate submission (replace with actual backend call)
-    setTimeout(() => {
-      setIsSubmitting(false)
+    try {
+      // call on-chain addJoke
+      const hash = await addJoke(joke.trim(), previewUrl ?? '')
+      // show a toast or simple alert for pending tx
+      if (hash) {
+        alert('Transaction sent: ' + hash + '\nWaiting for confirmation...')
+      }
+
+      // After success, clear form
       setJoke('')
       setCharCount(0)
-      // Clear file selection and revoke preview
       if (previewUrl) {
         try {
           URL.revokeObjectURL(previewUrl)
@@ -63,12 +69,14 @@ export default function Write() {
       setPreviewUrl(null)
       setFileError(null)
 
-      // Show success message
-      alert(
-        `🎉 Joke submitted!${selectedFile ? ' (with image)' : ''} Check it out on the Home page.`
-      )
+      alert('🎉 Joke submitted on-chain! It will appear after indexing.')
       router.push('/')
-    }, 1500)
+    } catch (err) {
+      console.error('Add joke tx failed', err)
+      alert('Failed to submit joke: ' + ((err as any)?.message ?? String(err)))
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   // Handle file selection

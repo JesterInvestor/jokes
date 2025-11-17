@@ -72,7 +72,7 @@ const questsData: Quest[] = [
     total: 100,
   },
   {
-    id: 6,
+    id: 5,
     title: 'Daily Dose',
     description: 'Submit a joke every day for a week',
     reward: 200,
@@ -82,7 +82,7 @@ const questsData: Quest[] = [
     total: 7,
   },
   {
-    id: 7,
+    id: 6,
     title: 'Meme Maestro',
     description: 'Upload an image or GIF with your joke',
     reward: 30,
@@ -92,7 +92,7 @@ const questsData: Quest[] = [
     total: 1,
   },
   {
-    id: 8,
+    id: 7,
     title: 'Share the Laughs',
     description: 'Share a joke using the Share button',
     reward: 20,
@@ -102,7 +102,7 @@ const questsData: Quest[] = [
     total: 1,
   },
   {
-    id: 9,
+    id: 8,
     title: 'Welcome Aboard',
     description: 'Connect your wallet to get started',
     reward: 5,

@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAppKit } from '@reown/appkit/react'
 import { useAccount } from 'wagmi'
+import { useVote } from '../lib/contractHelpers'
+import { ethers } from 'ethers'
 
 interface Joke {
   id: number
@@ -38,8 +40,54 @@ const initialJokes: Joke[] = [
 
 export default function Home() {
   const [jokes, setJokes] = useState<Joke[]>(initialJokes)
+  const [pendingTxs, setPendingTxs] = useState<Record<number, string | null>>({})
   const { open } = useAppKit()
   const { address, isConnected } = useAccount()
+  const { vote, isLoading: voteLoading } = useVote()
+  const contractAddress = process.env.NEXT_PUBLIC_JOKE_VOTING_ADDRESS
+
+  useEffect(() => {
+    if (!contractAddress) return
+    if (!(window as any).ethereum) return
+
+    try {
+      const provider = new ethers.providers.Web3Provider((window as any).ethereum)
+      const abi = [
+        'event Voted(uint256 indexed id,address indexed voter,int8 vote,int256 totalVotes)',
+        'event JokeAdded(uint256 indexed id,address indexed author,string content,string imageUrl)'
+      ]
+      const contract = new ethers.Contract(contractAddress, abi, provider)
+
+      const votedHandler = (id: any, voter: string, voteVal: any, totalVotes: any) => {
+        const idx = Number(id.toString())
+        let tv = 0
+        try { tv = Number(totalVotes.toString()) } catch (e) { tv = 0 }
+        setJokes(prev => prev.map(j => j.id === idx ? { ...j, votes: tv, userVote: voter.toLowerCase() === (address ?? '').toLowerCase() ? (Number(voteVal) === 0 ? null : Number(voteVal)) : j.userVote } : j))
+        // clear pending tx for that joke
+        setPendingTxs(prev => ({ ...prev, [idx]: null }))
+      }
+
+      const addedHandler = (id: any, author: string, content: string, imageUrl: string) => {
+        const idx = Number(id.toString())
+        setJokes(prev => [
+          { id: idx, content, author, votes: 0, userVote: author.toLowerCase() === (address ?? '').toLowerCase() ? null : null },
+          ...prev
+        ])
+      }
+
+      contract.on('Voted', votedHandler)
+      contract.on('JokeAdded', addedHandler)
+
+      return () => {
+        try {
+          contract.off('Voted', votedHandler)
+          contract.off('JokeAdded', addedHandler)
+        } catch (e) {}
+      }
+    } catch (e) {
+      console.warn('Event listener setup failed', e)
+    }
+  }, [contractAddress, address])
 
   const handleVote = (jokeId: number, voteType: number) => {
     if (!isConnected) {
@@ -47,37 +95,42 @@ export default function Home() {
       return
     }
 
-    setJokes(jokes.map(joke => {
-      if (joke.id === jokeId) {
-        const currentVote = joke.userVote
-        let newVotes = joke.votes
-        let newUserVote: number | null = voteType
+    // optimistic UI: mark tx pending and adjust vote locally
+    setJokes(prev => prev.map(j => {
+      if (j.id !== jokeId) return j
+      const currentVote = j.userVote
+      let newVotes = j.votes
+      let newUserVote: number | null = voteType
 
-        // If already voted the same way, remove vote
-        if (currentVote === voteType) {
-          newVotes -= voteType
-          newUserVote = null
-        } 
-        // If voted differently before, remove old vote and add new
-        else if (currentVote !== null) {
-          newVotes = newVotes - currentVote + voteType
-        } 
-        // New vote
-        else {
-          newVotes += voteType
-        }
-
-        return { ...joke, votes: newVotes, userVote: newUserVote }
+      if (currentVote === voteType) {
+        newVotes -= voteType
+        newUserVote = null
+      } else if (currentVote !== null) {
+        newVotes = newVotes - currentVote + voteType
+      } else {
+        newVotes += voteType
       }
-      return joke
+
+      return { ...j, votes: newVotes, userVote: newUserVote }
     }))
 
     // Play sound
-    try {
-      const audio = new Audio('/sounds/vote.mp3')
-      audio.volume = 0.3
-      audio.play().catch(() => {})
-    } catch (e) {}
+    try { const audio = new Audio('/sounds/vote.mp3'); audio.volume = 0.3; audio.play().catch(()=>{}) } catch(e) {}
+
+    // send on-chain tx
+    (async () => {
+      try {
+        setPendingTxs(prev => ({ ...prev, [jokeId]: 'pending' }))
+        const txHash = await vote(jokeId, voteType as 1 | -1)
+        if (txHash) {
+          setPendingTxs(prev => ({ ...prev, [jokeId]: txHash }))
+        }
+      } catch (err) {
+        console.error('Vote tx failed', err)
+        setPendingTxs(prev => ({ ...prev, [jokeId]: null }))
+        alert('Vote transaction failed')
+      }
+    })()
   }
 
   const handleShare = (joke: Joke) => {
