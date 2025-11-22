@@ -3,16 +3,24 @@
 @tailwind utilities;
 
 :root {
-  --fluorescent-pink: #FF00FF;
-  --fluorescent-cyan: #00FFFF;
-  --fluorescent-yellow: #FFFF00;
-  --fluorescent-green: #00FF00;
-  --fluorescent-orange: #FF6600;
-  --fluorescent-purple: #9D00FF;
+  /* Cinema retro palette (provided) */
+  --brand-magenta: #B7239B;
+  --brand-pink: #ED3DD6;
+  --brand-yellow: #FFE91A;
+  --brand-orange: #FE5700;
+  --brand-red: #EA1104;
+
+  /* Background base colors */
+  --bg-900: #040007; /* near-black purple */
+  --bg-800: #0f0210; /* deep purple */
 }
 
 body {
   @apply text-white;
+  background: radial-gradient(1000px 400px at 10% 10%, rgba(183,35,155,0.15), transparent 10%),
+              radial-gradient(800px 300px at 90% 80%, rgba(237,61,214,0.12), transparent 10%),
+              linear-gradient(180deg, var(--bg-800), var(--bg-900));
+  background-attachment: fixed;
 }
 
 /* Custom scrollbar */
@@ -25,21 +33,21 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--fluorescent-cyan);
+  background: linear-gradient(180deg, var(--brand-pink), var(--brand-magenta));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--fluorescent-pink);
+  background: linear-gradient(180deg, var(--brand-magenta), var(--brand-pink));
 }
 
 /* Glowing effect utility */
 .glow-text {
-  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  text-shadow: 0 0 8px currentColor, 0 0 20px currentColor, 0 0 40px rgba(0,0,0,0.15);
 }
 
 .glow-box {
-  box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  box-shadow: 0 0 8px currentColor, 0 0 20px currentColor, 0 0 40px rgba(0,0,0,0.2);
 }
 
 /* Animations */

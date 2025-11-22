@@ -8,13 +8,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        fluorescent: {
-          pink: '#FF00FF',
-          cyan: '#00FFFF',
-          yellow: '#FFFF00',
-          green: '#00FF00',
-          orange: '#FF6600',
-          purple: '#9D00FF',
+        brand: {
+          magenta: '#B7239B',
+          pink: '#ED3DD6',
+          yellow: '#FFE91A',
+          orange: '#FE5700',
+          red: '#EA1104',
         },
       },
       animation: {
