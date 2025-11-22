@@ -83,7 +83,7 @@ type VoteResult = {
   error?: unknown
 }
 
-export function useVote(contractAddress?: string): VoteResult {
+export function useVote(contractAddress?: string, onSuccess?: () => void): VoteResult {
   const { address: userAddress, isConnected } = useAccount()
   let signer: ethers.Signer | undefined
   if (typeof window !== 'undefined' && (window as any).ethereum) {
@@ -111,6 +111,8 @@ export function useVote(contractAddress?: string): VoteResult {
         const tx = await contract.vote(id, v)
         await tx.wait()
         setIsSuccess(true)
+        // trigger optional callback (e.g., refresh the UI list)
+        try { if (onSuccess) { Promise.resolve(onSuccess()) } } catch (e) {}
         return tx.hash
       } catch (e) {
         setHookError(e)

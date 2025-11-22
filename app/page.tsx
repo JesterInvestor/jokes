@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useAppKit } from '@reown/appkit/react'
 import { useAccount } from 'wagmi'
 import { useVote } from '../lib/contractHelpers'
+import { useJokes } from '../lib/useJokes'
 import { ethers } from 'ethers'
 
 interface Joke {
@@ -14,80 +15,15 @@ interface Joke {
   userVote: number | null
 }
 
-const initialJokes: Joke[] = [
-  {
-    id: 1,
-    content: "Why don't scientists trust atoms? Because they make up everything!",
-    author: 'JokesMaster',
-    votes: 42,
-    userVote: null,
-  },
-  {
-    id: 2,
-    content: "What do you call a bear with no teeth? A gummy bear!",
-    author: 'PunKing',
-    votes: 38,
-    userVote: null,
-  },
-  {
-    id: 3,
-    content: "Why did the scarecrow win an award? Because he was outstanding in his field!",
-    author: 'FarmerJokes',
-    votes: 35,
-    userVote: null,
-  },
-]
-
 export default function Home() {
-  const [jokes, setJokes] = useState<Joke[]>(initialJokes)
+  const { jokes, loading, refresh } = useJokes()
+  const [localLoadingIgnored, setLocalLoadingIgnored] = useState(false)
   const [pendingTxs, setPendingTxs] = useState<Record<number, string | null>>({})
   const { open } = useAppKit()
   const { address, isConnected } = useAccount()
-  const { vote, isLoading: voteLoading } = useVote()
+  const { vote, isLoading: voteLoading } = useVote(undefined, refresh)
   const contractAddress = process.env.NEXT_PUBLIC_JOKE_VOTING_ADDRESS
-
-  useEffect(() => {
-    if (!contractAddress) return
-    if (!(window as any).ethereum) return
-
-    try {
-      const provider = new ethers.providers.Web3Provider((window as any).ethereum)
-      const abi = [
-        'event Voted(uint256 indexed id,address indexed voter,int8 vote,int256 totalVotes)',
-        'event JokeAdded(uint256 indexed id,address indexed author,string content,string imageUrl)'
-      ]
-      const contract = new ethers.Contract(contractAddress, abi, provider)
-
-      const votedHandler = (id: any, voter: string, voteVal: any, totalVotes: any) => {
-        const idx = Number(id.toString())
-        let tv = 0
-        try { tv = Number(totalVotes.toString()) } catch (e) { tv = 0 }
-        setJokes(prev => prev.map(j => j.id === idx ? { ...j, votes: tv, userVote: voter.toLowerCase() === (address ?? '').toLowerCase() ? (Number(voteVal) === 0 ? null : Number(voteVal)) : j.userVote } : j))
-        // clear pending tx for that joke
-        setPendingTxs(prev => ({ ...prev, [idx]: null }))
-      }
-
-      const addedHandler = (id: any, author: string, content: string, imageUrl: string) => {
-        const idx = Number(id.toString())
-        setJokes(prev => [
-          { id: idx, content, author, votes: 0, userVote: author.toLowerCase() === (address ?? '').toLowerCase() ? null : null },
-          ...prev
-        ])
-      }
-
-      contract.on('Voted', votedHandler)
-      contract.on('JokeAdded', addedHandler)
-
-      return () => {
-        try {
-          contract.off('Voted', votedHandler)
-          contract.off('JokeAdded', addedHandler)
-        } catch (e) {}
-      }
-    } catch (e) {
-      console.warn('Event listener setup failed', e)
-    }
-  }, [contractAddress, address])
+  // Event subscriptions and fetching handled inside `useJokes` hook
 
   const handleVote = (jokeId: number, voteType: number) => {
     if (!isConnected) {
