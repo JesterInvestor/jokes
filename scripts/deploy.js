@@ -16,8 +16,16 @@ async function main() {
   const BACKEND_PRIVATE_KEY = process.env.BACKEND_PRIVATE_KEY || ''
   const BACKEND_ADDRESS = process.env.BACKEND_ADDRESS || ''
 
+  function isValidPrivateKey(k) {
+    return typeof k === 'string' && /^0x[0-9a-fA-F]{64}$/.test(k)
+  }
+
   if (!DEPLOYER_PRIVATE_KEY) {
-    throw new Error('No deployer private key provided. Set DEPLOYER_PRIVATE_KEY or BACKEND_PRIVATE_KEY in env')
+    throw new Error('No deployer private key provided. Set DEPLOYER_PRIVATE_KEY or BACKEND_PRIVATE_KEY in your environment or .env.local')
+  }
+
+  if (!isValidPrivateKey(DEPLOYER_PRIVATE_KEY)) {
+    throw new Error('DEPLOYER_PRIVATE_KEY appears invalid. It must be a 32-byte hex string starting with 0x. Replace the placeholder with a valid private key or leave it empty to skip accounts in Hardhat config.')
   }
 
   console.log('Using RPC:', RPC)
