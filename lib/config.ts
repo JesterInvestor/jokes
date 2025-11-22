@@ -23,9 +23,9 @@ export const metadata = {
 export const networks = [mainnet, base] as [AppKitNetwork, ...AppKitNetwork[]]
 
 export const wagmiAdapter = new WagmiAdapter({
-  storage: createStorage({
+  storage: (createStorage({
     storage: cookieStorage
-  }),
+  }) as any),
   ssr: true,
   projectId,
   networks
