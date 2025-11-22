@@ -20,7 +20,27 @@ export const metadata = {
 }
 
 // Create Wagmi Adapter
-export const networks = [mainnet, base] as [AppKitNetwork, ...AppKitNetwork[]]
+// Prefer Celo networks: Celo Mainnet and Celo Sepolia (testnet)
+const CELO_MAINNET_RPC = process.env.CELO_MAINNET_RPC || process.env.RPC_URL || 'https://forno.celo.org'
+const CELO_SEPOLIA_RPC = process.env.CELO_SEPOLIA_RPC || process.env.RPC_URL || process.env.CELO_ALFAJORES_RPC || ''
+
+const celoMainnet: AppKitNetwork = ({
+  id: 'celo-mainnet',
+  name: 'Celo Mainnet',
+  chainId: 42220,
+  rpcUrl: CELO_MAINNET_RPC,
+  nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
+} as unknown) as AppKitNetwork
+
+const celoSepolia: AppKitNetwork = ({
+  id: 'celo-sepolia',
+  name: 'Celo Sepolia',
+  chainId: 11142220,
+  rpcUrl: CELO_SEPOLIA_RPC || 'https://rpc.ankr.com/celo_sepolia',
+  nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
+} as unknown) as AppKitNetwork
+
+export const networks = [celoSepolia, celoMainnet] as [AppKitNetwork, ...AppKitNetwork[]]
 
 export const wagmiAdapter = new WagmiAdapter({
   storage: (createStorage({
@@ -38,7 +58,8 @@ export const modal = createAppKit({
   adapters: [wagmiAdapter],
   projectId,
   networks,
-  defaultNetwork: mainnet,
+  // Default to the test Celo Sepolia network for autoconnect/switch behavior
+  defaultNetwork: celoSepolia as any,
   metadata,
   features: {
     analytics: true,
