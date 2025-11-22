@@ -10,7 +10,8 @@ const path = require('path')
 const { ethers } = require('ethers')
 
 async function main() {
-  const RPC = process.env.CELO_ALFAJORES_RPC || process.env.RPC_URL || 'http://127.0.0.1:8545'
+  // Prefer explicit RPC env vars. Support both RPC_URL and legacy/mistyped RCP_URL.
+  const RPC = process.env.RPC_URL || process.env.RCP_URL || process.env.CELO_ALFAJORES_RPC || 'http://127.0.0.1:8545'
   const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY || process.env.BACKEND_PRIVATE_KEY
   const BACKEND_PRIVATE_KEY = process.env.BACKEND_PRIVATE_KEY || ''
   const BACKEND_ADDRESS = process.env.BACKEND_ADDRESS || ''
@@ -19,6 +20,7 @@ async function main() {
     throw new Error('No deployer private key provided. Set DEPLOYER_PRIVATE_KEY or BACKEND_PRIVATE_KEY in env')
   }
 
+  console.log('Using RPC:', RPC)
   const provider = new ethers.providers.JsonRpcProvider(RPC)
   const deployerWallet = new ethers.Wallet(DEPLOYER_PRIVATE_KEY, provider)
   console.log('Deployer address:', await deployerWallet.getAddress())

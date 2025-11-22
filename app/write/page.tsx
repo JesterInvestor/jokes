@@ -20,6 +20,11 @@ export default function Write() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<string | null>(null)
 
+  // AI generator state
+  const [aiPrompt, setAiPrompt] = useState('')
+  const [generatedJoke, setGeneratedJoke] = useState<string | null>(null)
+  const [generating, setGenerating] = useState(false)
+
   const handleJokeChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value
     if (text.length <= maxChars) {
@@ -190,6 +195,67 @@ export default function Write() {
           {/* Image preview removed to simplify UI and avoid client-side object URL previews */}
         </div>
         <div className="bg-black/60 backdrop-blur-sm border-2 border-brand-yellow/30 rounded-2xl p-6 focus-within:border-brand-yellow transition-all duration-300">
+          <label className="block mb-3 text-sm text-gray-300">Or generate one with AI</label>
+          <div className="flex gap-2 mb-3">
+            <input
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="e.g. puns about cats, dad jokes, programming humor"
+              className="flex-1 bg-black/30 rounded-md px-3 py-2 text-sm text-white placeholder-gray-500"
+            />
+            <button
+              type="button"
+              onClick={async () => {
+                setGenerating(true)
+                setGeneratedJoke(null)
+                try {
+                  const res = await fetch('/api/ai-joke', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: aiPrompt })
+                  })
+                  const data = await res.json()
+                  setGeneratedJoke(data?.joke ?? null)
+                } catch (e) {
+                  console.error('AI generate failed', e)
+                  setGeneratedJoke('Whoops, AI failed to generate a joke.')
+                } finally {
+                  setGenerating(false)
+                }
+              }}
+              className={`px-4 py-2 rounded-md font-semibold ${generating ? 'bg-gray-600 text-gray-300' : 'bg-brand-magenta text-white hover:scale-105'}`}
+            >
+              {generating ? 'Generating…' : 'Generate'}
+            </button>
+          </div>
+
+          {generatedJoke && (
+            <div className="mb-4 p-4 bg-black/50 border border-brand-magenta rounded-md">
+              <div className="text-sm text-gray-200 mb-2">AI Suggestion</div>
+              <div className="text-lg text-white mb-3">{generatedJoke}</div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setJoke((prev) => (prev ? `${prev}\n\n${generatedJoke}` : generatedJoke))
+                    setGeneratedJoke(null)
+                    setAiPrompt('')
+                  }}
+                  className="px-4 py-2 rounded-full bg-brand-yellow text-black font-bold hover:scale-105"
+                >
+                  Insert
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGeneratedJoke(null)}
+                  className="px-4 py-2 rounded-full bg-gray-700 text-white"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+
           <textarea
             value={joke}
             onChange={handleJokeChange}
