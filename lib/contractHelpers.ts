@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { useAccount, useSigner } from 'wagmi'
+import { useAccount } from 'wagmi'
 import { ethers } from 'ethers'
 
 // Minimal ABI for the functions we need on JokeVoting
@@ -37,7 +37,11 @@ type AddJokeResult = {
 
 export function useAddJoke(contractAddress?: string): AddJokeResult {
   const { address: userAddress, isConnected } = useAccount()
-  const { data: signer } = useSigner()
+  let signer: ethers.Signer | undefined
+  if (typeof window !== 'undefined' && (window as any).ethereum) {
+    const web3Provider = new ethers.providers.Web3Provider((window as any).ethereum)
+    signer = web3Provider.getSigner()
+  }
   const target = (contractAddress || DEFAULT_CONTRACT_ADDRESS) as string | undefined
 
   const [isLoading, setIsLoading] = useState(false)
@@ -81,7 +85,11 @@ type VoteResult = {
 
 export function useVote(contractAddress?: string): VoteResult {
   const { address: userAddress, isConnected } = useAccount()
-  const { data: signer } = useSigner()
+  let signer: ethers.Signer | undefined
+  if (typeof window !== 'undefined' && (window as any).ethereum) {
+    const web3Provider = new ethers.providers.Web3Provider((window as any).ethereum)
+    signer = web3Provider.getSigner()
+  }
   const target = (contractAddress || DEFAULT_CONTRACT_ADDRESS) as string | undefined
 
   const [isLoading, setIsLoading] = useState(false)
