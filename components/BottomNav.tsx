@@ -36,7 +36,7 @@ export default function BottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-md border-t-2 border-fluorescent-cyan z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-md border-t-2 border-brand-magenta z-50">
       <div className="flex justify-around items-center h-20 max-w-md mx-auto px-4">
         {navItems.map((item) => {
           const isActive = pathname === item.path
@@ -46,8 +46,8 @@ export default function BottomNav() {
               onClick={() => handleNavClick(item.path)}
               className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 transform ${
                 isActive
-                  ? 'scale-110 text-fluorescent-cyan drop-shadow-[0_0_10px_rgba(0,255,255,0.8)]'
-                  : 'text-gray-400 hover:text-fluorescent-pink hover:scale-105'
+                  ? 'scale-110 text-brand-magenta drop-shadow-[0_0_10px_rgba(183,35,155,0.8)]'
+                  : 'text-gray-400 hover:text-brand-pink hover:scale-105'
               }`}
             >
               <span className={`text-2xl ${isActive ? 'animate-float' : ''}`}>

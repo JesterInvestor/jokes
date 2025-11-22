@@ -9,7 +9,7 @@ const CELO_ALFAJORES_RPC = process.env.CELO_ALFAJORES_RPC || "";
 
 const config: HardhatUserConfig = {
   solidity: {
-    compilers: [{ version: "0.8.19" }],
+    compilers: [{ version: "0.8.20" }],
   },
   networks: {
     hardhat: {},

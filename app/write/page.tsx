@@ -18,7 +18,6 @@ export default function Write() {
   const { addJoke, isLoading: addLoading } = useAddJoke()
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [fileError, setFileError] = useState<string | null>(null)
 
   const handleJokeChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -50,8 +49,8 @@ export default function Write() {
     } catch (e) {}
 
     try {
-      // call on-chain addJoke
-      const hash = await addJoke(joke.trim(), previewUrl ?? '')
+      // call on-chain addJoke (no client-side preview URL used)
+      const hash = await addJoke(joke.trim(), '')
       // show a toast or simple alert for pending tx
       if (hash) {
         alert('Transaction sent: ' + hash + '\nWaiting for confirmation...')
@@ -60,13 +59,7 @@ export default function Write() {
       // After success, clear form
       setJoke('')
       setCharCount(0)
-      if (previewUrl) {
-        try {
-          URL.revokeObjectURL(previewUrl)
-        } catch (err) {}
-      }
       setSelectedFile(null)
-      setPreviewUrl(null)
       setFileError(null)
 
       alert('🎉 Joke submitted on-chain! It will appear after indexing.')
@@ -97,27 +90,12 @@ export default function Write() {
       return
     }
 
-    // Create preview
-    const url = URL.createObjectURL(file)
-    // Revoke previous preview
-    if (previewUrl) {
-      try {
-        URL.revokeObjectURL(previewUrl)
-      } catch (err) {}
-    }
-
+    // Keep the file but do not generate an object URL preview to remove preview/simulation UI
     setSelectedFile(file)
-    setPreviewUrl(url)
   }
 
   const handleRemoveFile = () => {
-    if (previewUrl) {
-      try {
-        URL.revokeObjectURL(previewUrl)
-      } catch (err) {}
-    }
     setSelectedFile(null)
-    setPreviewUrl(null)
     setFileError(null)
   }
 
@@ -208,18 +186,10 @@ export default function Write() {
               </button>
             )}
           </div>
-          {fileError && <p className="text-sm text-fluorescent-pink mt-2">{fileError}</p>}
-
-          {previewUrl && (
-            <div className="mt-4">
-              <p className="text-sm text-gray-300 mb-2">Preview:</p>
-              <div className="w-full max-h-80 overflow-hidden rounded-lg">
-                <img src={previewUrl} alt="preview" className="w-full object-contain" />
-              </div>
-            </div>
-          )}
+          {fileError && <p className="text-sm text-brand-pink mt-2">{fileError}</p>}
+          {/* Image preview removed to simplify UI and avoid client-side object URL previews */}
         </div>
-        <div className="bg-black/60 backdrop-blur-sm border-2 border-fluorescent-yellow/30 rounded-2xl p-6 focus-within:border-fluorescent-yellow transition-all duration-300">
+        <div className="bg-black/60 backdrop-blur-sm border-2 border-brand-yellow/30 rounded-2xl p-6 focus-within:border-brand-yellow transition-all duration-300">
           <textarea
             value={joke}
             onChange={handleJokeChange}
@@ -229,11 +199,11 @@ export default function Write() {
           />
           
           {/* Character Count */}
-          <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-4">
             <span className={`text-sm font-bold ${
               charCount > maxChars * 0.9 
-                ? 'text-fluorescent-pink' 
-                : 'text-fluorescent-cyan'
+                ? 'text-brand-pink' 
+                : 'text-brand-magenta'
             }`}>
               {charCount} / {maxChars}
             </span>
@@ -247,7 +217,7 @@ export default function Write() {
             disabled={!joke.trim() || isSubmitting || !isConnected}
             className={`flex-1 font-bold py-4 rounded-full transition-all duration-300 ${
               joke.trim() && isConnected && !isSubmitting
-                ? 'bg-gradient-to-r from-fluorescent-yellow to-fluorescent-orange text-black hover:scale-105 glow-box cursor-pointer'
+                ? 'bg-gradient-to-r from-brand-yellow to-brand-orange text-black hover:scale-105 glow-box cursor-pointer'
                 : 'bg-gray-600 text-gray-400 cursor-not-allowed'
             }`}
           >
@@ -270,7 +240,7 @@ export default function Write() {
             disabled={!joke.trim()}
             className={`px-6 py-4 rounded-full font-bold transition-all duration-300 ${
               joke.trim()
-                ? 'bg-fluorescent-purple/20 border-2 border-fluorescent-purple text-fluorescent-purple hover:scale-105 cursor-pointer'
+                ? 'bg-brand-magenta/20 border-2 border-brand-magenta text-brand-magenta hover:scale-105 cursor-pointer'
                 : 'bg-gray-600 border-2 border-gray-500 text-gray-400 cursor-not-allowed'
             }`}
           >
@@ -280,23 +250,23 @@ export default function Write() {
       </form>
 
       {/* Tips Section */}
-      <div className="mt-12 bg-black/40 border-2 border-fluorescent-green/30 rounded-2xl p-6">
-        <h3 className="text-2xl font-bold text-fluorescent-green mb-4">💡 Tips for Great Jokes</h3>
+      <div className="mt-12 bg-black/40 border-2 border-brand-orange/30 rounded-2xl p-6">
+        <h3 className="text-2xl font-bold text-brand-orange mb-4">💡 Tips for Great Jokes</h3>
         <ul className="space-y-3 text-gray-300">
           <li className="flex items-start gap-3">
-            <span className="text-fluorescent-cyan">•</span>
+            <span className="text-brand-magenta">•</span>
             <span>Keep it short and punchy!</span>
           </li>
           <li className="flex items-start gap-3">
-            <span className="text-fluorescent-cyan">•</span>
+            <span className="text-brand-magenta">•</span>
             <span>Puns are always a winner</span>
           </li>
           <li className="flex items-start gap-3">
-            <span className="text-fluorescent-cyan">•</span>
+            <span className="text-brand-magenta">•</span>
             <span>Make it family-friendly</span>
           </li>
           <li className="flex items-start gap-3">
-            <span className="text-fluorescent-cyan">•</span>
+            <span className="text-brand-magenta">•</span>
             <span>Original jokes get more votes!</span>
           </li>
         </ul>

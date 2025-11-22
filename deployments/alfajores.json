@@ -1,0 +1,12 @@
+{
+  "network": "alfajores",
+  "chainId": 44787,
+  "contracts": {
+    "PunnyPower": {
+      "address": "0xb9E8E98d78D25eC6dbb95106BB272E197e6F064D"
+    },
+    "JokeVoting": {
+      "address": "0x561bA3E593D4672B1783562d6AD9A78a125a31Ba"
+    }
+  }
+}

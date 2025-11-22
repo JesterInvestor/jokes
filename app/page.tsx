@@ -158,18 +158,18 @@ export default function Home() {
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-5xl font-bold mb-4 glow-text text-fluorescent-cyan animate-pulse-glow">
+        <h1 className="text-5xl font-bold mb-4 glow-text text-brand-magenta animate-pulse-glow">
           😄 JOKES 😄
         </h1>
-        <p className="text-fluorescent-pink text-lg">
+        <p className="text-brand-pink text-lg">
           The funniest miniapp on Farcaster
         </p>
         
         {/* Wallet Connection */}
         <div className="mt-6">
           {isConnected ? (
-            <div className="flex items-center justify-center gap-3 bg-black/40 border-2 border-fluorescent-green rounded-full px-6 py-3 inline-flex">
-              <span className="text-fluorescent-green">✓</span>
+            <div className="flex items-center justify-center gap-3 bg-black/40 border-2 border-brand-orange rounded-full px-6 py-3 inline-flex">
+              <span className="text-brand-orange">✓</span>
               <span className="text-sm">
                 {address?.slice(0, 6)}...{address?.slice(-4)}
               </span>
@@ -177,7 +177,7 @@ export default function Home() {
           ) : (
             <button
               onClick={() => open()}
-              className="bg-gradient-to-r from-fluorescent-pink to-fluorescent-purple text-white font-bold py-3 px-8 rounded-full hover:scale-105 transition-transform duration-300 glow-box"
+              className="bg-gradient-to-r from-brand-pink to-brand-magenta text-white font-bold py-3 px-8 rounded-full hover:scale-105 transition-transform duration-300 glow-box"
             >
               Connect Wallet
             </button>
@@ -190,14 +190,14 @@ export default function Home() {
         {jokes.map((joke) => (
           <div
             key={joke.id}
-            className="bg-black/60 backdrop-blur-sm border-2 border-fluorescent-cyan/30 rounded-2xl p-6 hover:border-fluorescent-cyan transition-all duration-300 hover:scale-[1.02]"
+            className="bg-black/60 backdrop-blur-sm border-2 border-brand-magenta/30 rounded-2xl p-6 hover:border-brand-magenta transition-all duration-300 hover:scale-[1.02]"
           >
             {/* Joke Content */}
             <p className="text-lg mb-4 leading-relaxed">{joke.content}</p>
             
             {/* Author */}
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm text-fluorescent-yellow">
+              <span className="text-sm text-brand-yellow">
                 by @{joke.author}
               </span>
             </div>
@@ -209,18 +209,18 @@ export default function Home() {
                 <button
                   onClick={() => handleVote(joke.id, 1)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${
-                    joke.userVote === 1
-                      ? 'bg-fluorescent-green text-black scale-110'
-                      : 'bg-black/40 hover:bg-fluorescent-green/20 border border-fluorescent-green/50'
+                      joke.userVote === 1
+                      ? 'bg-brand-orange text-black scale-110'
+                      : 'bg-black/40 hover:bg-brand-orange/20 border border-brand-orange/50'
                   }`}
                 >
                   <span className="text-xl">👍</span>
                 </button>
 
                 {/* Vote Count */}
-                <span className={`font-bold text-xl ${
-                  joke.votes > 0 ? 'text-fluorescent-green' : 
-                  joke.votes < 0 ? 'text-fluorescent-pink' : 
+                  <span className={`font-bold text-xl ${
+                  joke.votes > 0 ? 'text-brand-orange' : 
+                  joke.votes < 0 ? 'text-brand-pink' : 
                   'text-gray-400'
                 }`}>
                   {joke.votes}
@@ -230,9 +230,9 @@ export default function Home() {
                 <button
                   onClick={() => handleVote(joke.id, -1)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${
-                    joke.userVote === -1
-                      ? 'bg-fluorescent-pink text-black scale-110'
-                      : 'bg-black/40 hover:bg-fluorescent-pink/20 border border-fluorescent-pink/50'
+                      joke.userVote === -1
+                      ? 'bg-brand-pink text-black scale-110'
+                      : 'bg-black/40 hover:bg-brand-pink/20 border border-brand-pink/50'
                   }`}
                 >
                   <span className="text-xl">👎</span>
@@ -242,10 +242,10 @@ export default function Home() {
               {/* Share Button */}
               <button
                 onClick={() => handleShare(joke)}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/40 border border-fluorescent-purple/50 hover:bg-fluorescent-purple/20 transition-all duration-300 hover:scale-105"
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/40 border border-brand-magenta/50 hover:bg-brand-magenta/20 transition-all duration-300 hover:scale-105"
               >
                 <span className="text-xl">🚀</span>
-                <span className="text-sm font-bold text-fluorescent-purple">Share</span>
+                <span className="text-sm font-bold text-brand-magenta">Share</span>
               </button>
             </div>
           </div>
