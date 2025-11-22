@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAppKit } from '@reown/appkit/react'
 import { useAccount } from 'wagmi'
 import { useVote } from '../lib/contractHelpers'
 import { useJokes } from '../lib/useJokes'
-import { ethers } from 'ethers'
+ 
 
 interface Joke {
   id: number
@@ -16,8 +16,7 @@ interface Joke {
 }
 
 export default function Home() {
-  const { jokes, loading, refresh } = useJokes()
-  const [localLoadingIgnored, setLocalLoadingIgnored] = useState(false)
+  const { jokes, loading, refresh, setJokes } = useJokes()
   const [pendingTxs, setPendingTxs] = useState<Record<number, string | null>>({})
   const { open } = useAppKit()
   const { address, isConnected } = useAccount()

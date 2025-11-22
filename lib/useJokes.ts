@@ -112,7 +112,7 @@ export function useJokes(contractAddress?: string) {
     }
   }, [contractAddress, fetchAll])
 
-  return { jokes, loading, refresh: fetchAll }
+  return { jokes, loading, refresh: fetchAll, setJokes }
 }
 
 export type { Joke }

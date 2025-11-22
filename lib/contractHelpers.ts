@@ -121,7 +121,7 @@ export function useVote(contractAddress?: string, onSuccess?: () => void): VoteR
         setIsLoading(false)
       }
     },
-    [isConnected, target, signer]
+    [isConnected, target, signer, onSuccess]
   )
 
   return { vote, isLoading, isSuccess, error: hookError }
