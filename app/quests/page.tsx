@@ -1,7 +1,8 @@
-'use client'
+"use client"
 
 import { useState } from 'react'
 import { useAccount } from 'wagmi'
+import { useQuests } from '../../lib/useQuests'
 
 interface LeaderboardEntry {
   rank: number
@@ -115,7 +116,7 @@ const questsData: Quest[] = [
 
 export default function Quests() {
   const [activeTab, setActiveTab] = useState<'quests' | 'leaderboard'>('quests')
-  const [quests, setQuests] = useState<Quest[]>(questsData)
+  const { quests, loading, refresh, claim } = useQuests()
   const { isConnected } = useAccount()
 
   // Increment progress for a quest (simulate action)
@@ -193,90 +194,75 @@ export default function Quests() {
             </div>
           )}
 
-          {quests.map((quest) => (
-            <div
-              key={quest.id}
-              className={`bg-black/60 backdrop-blur-sm border-2 rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] ${
-                quest.completed
-                  ? 'border-fluorescent-green'
-                  : 'border-fluorescent-purple/30 hover:border-fluorescent-purple'
-              }`}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-4">
-                  <span className="text-4xl">{quest.icon}</span>
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-1">{quest.title}</h3>
-                    <p className="text-gray-400 text-sm">{quest.description}</p>
+          {loading ? (
+            <div className="text-center text-gray-400 py-8">Loading quests...</div>
+          ) : (
+            quests.map((quest) => (
+              <div
+                key={quest.id}
+                className={`bg-black/60 backdrop-blur-sm border-2 rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] ${
+                  quest.active ? 'border-fluorescent-purple/30 hover:border-fluorescent-purple' : 'border-gray-700'
+                }`}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <span className="text-4xl">{quest.icon}</span>
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-1">{quest.title}</h3>
+                      <p className="text-gray-400 text-sm">{quest.description}</p>
+                    </div>
                   </div>
+                  {quest.claimed && <span className="text-2xl animate-float">✅</span>}
                 </div>
-                {quest.completed && (
-                  <span className="text-2xl animate-float">✅</span>
+
+                {/* Progress Bar */}
+                {!quest.claimed && !quest.completed && (
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-fluorescent-cyan">Reward: {quest.reward} Punny Power</span>
+                      <span className="text-fluorescent-yellow">{quest.eligible ? 'Eligible' : 'Not eligible'}</span>
+                    </div>
+                    <div className="h-3 bg-black/40 rounded-full overflow-hidden border border-fluorescent-purple/30">
+                      <div className="h-full bg-gradient-to-r from-fluorescent-purple to-fluorescent-pink transition-all duration-500" style={{ width: '100%' }} />
+                    </div>
+                  </div>
                 )}
-              </div>
 
-              {/* Progress Bar */}
-              {!quest.completed && (
-                <div className="mb-4">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-fluorescent-cyan">
-                      Progress: {quest.progress}/{quest.total}
-                    </span>
-                    <span className="text-fluorescent-yellow">
-                      +{quest.reward} Punny Power
-                    </span>
-                  </div>
-                  <div className="h-3 bg-black/40 rounded-full overflow-hidden border border-fluorescent-purple/30">
-                    <div
-                      className="h-full bg-gradient-to-r from-fluorescent-purple to-fluorescent-pink transition-all duration-500"
-                      style={{ width: `${(quest.progress / quest.total) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {quest.completed && (
-                <div className="bg-fluorescent-green/20 border border-fluorescent-green rounded-lg p-3 text-center">
-                  <div className="flex items-center justify-between">
-                    <span className="text-fluorescent-green font-bold">
-                      🎉 Completed! +{quest.reward} Punny Power earned!
-                    </span>
-                    {!quest.claimed ? (
+                {quest.eligible && !quest.claimed && (
+                  <div className="bg-fluorescent-green/20 border border-fluorescent-green rounded-lg p-3 text-center">
+                    <div className="flex items-center justify-between">
+                      <span className="text-fluorescent-green font-bold">🎉 Eligible: +{quest.reward} Punny Power</span>
                       <button
-                        onClick={() => claimReward(quest.id)}
+                        onClick={async () => {
+                          try {
+                            await claim(quest.id)
+                            alert('Claimed reward!')
+                          } catch (e) {
+                            alert('Claim failed: ' + ((e as any)?.message ?? String(e)))
+                          }
+                        }}
                         className="ml-4 px-4 py-2 rounded-full bg-fluorescent-green text-black font-bold"
                       >
                         Claim
                       </button>
-                    ) : (
-                      <span className="text-sm text-gray-300">Claimed</span>
-                    )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Actions */}
-              {!quest.completed && (
-                <div className="flex items-center gap-4 mt-3">
-                  <button
-                    onClick={() => incrementProgress(quest.id, 1)}
-                    className="px-4 py-2 rounded-full bg-fluorescent-purple text-white font-bold"
-                  >
-                    Do it
-                  </button>
-                  <button
-                    onClick={() => incrementProgress(quest.id, quest.total)}
-                    className="px-4 py-2 rounded-full bg-black/40 border border-fluorescent-purple text-gray-200"
-                  >
-                    Complete (simulate)
-                  </button>
-                  {!isConnected && quest.title === 'Welcome Aboard' && (
-                    <span className="text-sm text-fluorescent-orange">Connect your wallet to complete this quest</span>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+                {/* Actions */}
+                {!quest.eligible && !quest.claimed && (
+                  <div className="flex items-center gap-4 mt-3">
+                    <button
+                      onClick={() => alert('This quest is not eligible for your account yet.')}
+                      className="px-4 py-2 rounded-full bg-fluorescent-purple text-white font-bold"
+                    >
+                      How to qualify
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
       )}
 
