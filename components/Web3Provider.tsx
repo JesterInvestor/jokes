@@ -39,7 +39,7 @@ function NetworkGuard({ children }: { children: ReactNode }) {
             await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: hexChainId }] })
             return
           } catch (switchError) {
-            if (switchError && switchError.code === 4902) {
+            if (switchError && (switchError as any).code === 4902) {
               const sepoliaNetwork = networks?.[0]
               const rpc = sepoliaNetwork?.rpcUrl || 'https://rpc.ankr.com/celo_sepolia'
               try {
