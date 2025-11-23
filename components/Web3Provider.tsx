@@ -10,7 +10,6 @@ const CELO_SEPOLIA_CHAIN_ID = 11142220
 function NetworkGuard({ children }: { children: ReactNode }) {
   const { isConnected } = useAccount()
   const { disconnect } = useDisconnect()
-  const { disconnect } = useDisconnect()
 
   useEffect(() => {
     if (!isConnected) return
