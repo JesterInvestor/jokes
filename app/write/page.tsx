@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAppKit } from '@reown/appkit/react'
+import CallSdkReady from '@/components/CallSdkReady'
 import { useAccount } from 'wagmi'
 import { useRouter } from 'next/navigation'
 import { useAddJoke } from '../../lib/contractHelpers'
@@ -11,14 +12,12 @@ export default function Write() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [charCount, setCharCount] = useState(0)
   const maxChars = 280
-  const maxFileSize = 5 * 1024 * 1024 // 5MB
   const { open } = useAppKit()
   const { address, isConnected } = useAccount()
   const router = useRouter()
   const { addJoke, isLoading: addLoading } = useAddJoke()
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [fileError, setFileError] = useState<string | null>(null)
+  
 
   // AI generator state
   const [aiPrompt, setAiPrompt] = useState('')
@@ -64,8 +63,6 @@ export default function Write() {
       // After success, clear form
       setJoke('')
       setCharCount(0)
-      setSelectedFile(null)
-      setFileError(null)
 
       alert('🎉 Joke submitted on-chain! It will appear after indexing.')
       router.push('/')
@@ -77,32 +74,7 @@ export default function Write() {
     }
   }
 
-  // Handle file selection
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFileError(null)
-    const file = e.target.files?.[0] ?? null
-    if (!file) return
-
-    // Validate type
-    if (!file.type.startsWith('image/')) {
-      setFileError('Only images and GIFs are allowed')
-      return
-    }
-
-    // Validate size
-    if (file.size > maxFileSize) {
-      setFileError('File is too large (max 5MB)')
-      return
-    }
-
-    // Keep the file but do not generate an object URL preview to remove preview/simulation UI
-    setSelectedFile(file)
-  }
-
-  const handleRemoveFile = () => {
-    setSelectedFile(null)
-    setFileError(null)
-  }
+  
 
   const handleShare = () => {
     if (!joke.trim()) return
@@ -113,18 +85,8 @@ export default function Write() {
       audio.play().catch(() => {})
     } catch (e) {}
 
-    // Try to share with file if available and supported
     const nav: any = navigator
-    if (selectedFile && nav.canShare && nav.canShare({ files: [selectedFile] })) {
-      nav
-        .share({
-          title: 'Check out my joke!',
-          text: joke,
-          files: [selectedFile],
-          url: window.location.href,
-        })
-        .catch(() => {})
-    } else if (nav.share) {
+    if (nav.share) {
       nav
         .share({
           title: 'Check out my joke!',
@@ -133,9 +95,8 @@ export default function Write() {
         })
         .catch(() => {})
     } else {
-      // Fallback: Copy to clipboard (text only)
       navigator.clipboard
-        .writeText(joke + (selectedFile ? '\n[image attached]' : ''))
+        .writeText(joke)
         .then(() => {
           alert('Joke copied to clipboard!')
         })
@@ -145,6 +106,7 @@ export default function Write() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <CallSdkReady />
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-5xl font-bold mb-4 glow-text text-fluorescent-yellow animate-pulse-glow">
@@ -170,30 +132,7 @@ export default function Write() {
 
       {/* Joke Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* File upload */}
-        <div className="bg-black/60 backdrop-blur-sm border-2 border-fluorescent-yellow/30 rounded-2xl p-6 transition-all duration-300">
-          <label className="block mb-2 font-bold text-sm">Attach image or GIF (optional)</label>
-          <div className="flex items-center gap-4">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              disabled={isSubmitting}
-              className="text-sm text-gray-300"
-            />
-            {selectedFile && (
-              <button
-                type="button"
-                onClick={handleRemoveFile}
-                className="text-sm px-3 py-2 rounded-full bg-gray-700 text-white"
-              >
-                Remove
-              </button>
-            )}
-          </div>
-          {fileError && <p className="text-sm text-brand-pink mt-2">{fileError}</p>}
-          {/* Image preview removed to simplify UI and avoid client-side object URL previews */}
-        </div>
+        {/* File upload removed */}
         <div className="bg-black/60 backdrop-blur-sm border-2 border-brand-yellow/30 rounded-2xl p-6 focus-within:border-brand-yellow transition-all duration-300">
           <label className="block mb-3 text-sm text-gray-300">Or generate one with AI</label>
           <div className="flex gap-2 mb-3">

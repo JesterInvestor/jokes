@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { Web3Provider } from '@/components/Web3Provider'
 import BottomNav from '@/components/BottomNav'
+import CallSdkReady from '@/components/CallSdkReady'
 
 export const metadata: Metadata = {
   title: 'Jokes - Farcaster Miniapp',
@@ -17,6 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="font-sans">
         <Web3Provider>
+          <CallSdkReady />
           <div className="min-h-screen bg-gradient-to-br from-black via-purple-900/20 to-black">
             <main className="pb-24">
               {children}

@@ -5,6 +5,7 @@ import { useAppKit } from '@reown/appkit/react'
 import { useAccount } from 'wagmi'
 import { useVote } from '../lib/contractHelpers'
 import { useJokes } from '../lib/useJokes'
+import CallSdkReady from '@/components/CallSdkReady'
  
 
 interface Joke {
@@ -91,6 +92,7 @@ export default function Home() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <CallSdkReady />
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-5xl font-bold mb-4 glow-text text-brand-magenta animate-pulse-glow">
