@@ -54,14 +54,20 @@ function NetworkGuard({ children }: { children: ReactNode }) {
                     blockExplorerUrls: ['https://explorer.celo.org/sepolia']
                   }]
                 })
+                // After adding, try switching again but do not force-disconnect on failure
+                try {
+                  await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: hexChainId }] })
+                } catch (e) {
+                  console.warn('wallet_switchEthereumChain after add failed', e)
+                }
                 return
               } catch (addError) {
                 console.warn('wallet_addEthereumChain failed', addError)
-                try { disconnect() } catch (e) {}
+                // don't disconnect automatically — just surface the error and allow the user to act
               }
             } else {
               console.warn('wallet_switchEthereumChain failed', switchError)
-              try { disconnect() } catch (e) {}
+              // do not disconnect automatically; leave wallet connected so user can take action
             }
           }
         }

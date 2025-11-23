@@ -78,15 +78,21 @@ export default function NetworkSwitcher() {
                 blockExplorerUrls: ['https://explorer.celo.org/sepolia']
               }]
             })
-            setOk(true)
-            return
+            // After adding, attempt to switch; do not disconnect on failure
+            try {
+              await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: hex }] })
+              setOk(true)
+              return
+            } catch (afterSwitchErr: any) {
+              // If switching after add fails, surface message but keep connection
+              setError(afterSwitchErr?.message || String(afterSwitchErr))
+              return
+            }
           } catch (addErr: any) {
             setError(addErr?.message || String(addErr))
-            try { disconnect() } catch (e) {}
           }
         } else {
           setError(switchError?.message || String(switchError))
-          try { disconnect() } catch (e) {}
         }
       }
     } catch (e: any) {

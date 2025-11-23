@@ -130,7 +130,7 @@ export default function Home() {
             className="bg-black/60 backdrop-blur-sm border-2 border-brand-magenta/30 rounded-2xl p-6 hover:border-brand-magenta transition-all duration-300 hover:scale-[1.02]"
           >
             {/* Joke Content */}
-            <p className="text-lg mb-4 leading-relaxed">{joke.content}</p>
+            <p className="text-lg mb-4 leading-relaxed text-white">{joke.content}</p>
             
             {/* Author */}
             <div className="flex items-center justify-between mb-4">

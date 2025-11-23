@@ -19,7 +19,7 @@ export default function RootLayout({
       <body className="font-sans">
         <Web3Provider>
           <CallSdkReady />
-          <div className="min-h-screen bg-gradient-to-br from-black via-purple-900/20 to-black">
+          <div className="min-h-screen">
             <main className="pb-24">
               {children}
             </main>
