@@ -41,7 +41,7 @@ function NetworkGuard({ children }: { children: ReactNode }) {
           } catch (switchError) {
             if (switchError && (switchError as any).code === 4902) {
               const sepoliaNetwork = networks?.[0]
-              const rpc = sepoliaNetwork?.rpcUrl || 'https://rpc.ankr.com/celo_sepolia'
+              const rpc = (sepoliaNetwork as any)?.rpcUrl || (sepoliaNetwork as any)?.rpcUrls?.default?.http?.[0] || 'https://rpc.ankr.com/celo_sepolia'
               try {
                 await provider.request({
                   method: 'wallet_addEthereumChain',
