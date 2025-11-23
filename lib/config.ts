@@ -64,6 +64,26 @@ export const wagmiAdapter = new WagmiAdapter({
 
 export const config = wagmiAdapter.wagmiConfig
 
+// Ensure the wagmi config includes the Celo Sepolia chain object so runtime
+// consumers (WagmiProvider / appkit) can resolve the chain without a
+// "Chain not configured" error. We perform a safe runtime mutation so this
+// works even if the adapter built its own chain list internally.
+try {
+  const anyConfig: any = wagmiAdapter.wagmiConfig as any
+  if (anyConfig && Array.isArray(anyConfig.chains)) {
+    const exists = anyConfig.chains.find((c: any) => Number(c?.id) === Number(celoSepoliaChain.id))
+    if (!exists) {
+      // Prepend to give it priority as the app's preferred test network
+      anyConfig.chains.unshift(celoSepoliaChain)
+    }
+  }
+} catch (e) {
+  // Non-fatal; if this fails the adapter will still work with its own chains
+  // and the NetworkGuard will attempt to switch the provider.
+  // eslint-disable-next-line no-console
+  console.warn('Failed to inject celoSepoliaChain into wagmi config', e)
+}
+
 // Create AppKit
 export const modal = createAppKit({
   adapters: [wagmiAdapter],
