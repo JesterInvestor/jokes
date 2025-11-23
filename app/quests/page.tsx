@@ -66,10 +66,10 @@ export default function Quests() {
               <div key={quest.id} className="bg-white/5 rounded-2xl p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
-                    <span className="text-4xl">{quest.icon}</span>
+                    <span className="text-4xl">{(quest as any).icon ?? '🎯'}</span>
                     <div>
                       <h3 className="text-xl font-bold text-white mb-1">{quest.title}</h3>
-                      <p className="text-gray-400 text-sm">{quest.description}</p>
+                      <p className="text-gray-400 text-sm">{(quest as any).description ?? ''}</p>
                     </div>
                   </div>
                   {quest.claimed && <span className="text-2xl">✅</span>}
