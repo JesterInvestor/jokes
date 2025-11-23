@@ -15,8 +15,8 @@ if (!projectId) {
 export const metadata = {
   name: 'Jokes - Farcaster Miniapp',
   description: 'Share and vote on jokes in the Farcaster ecosystem',
-  url: 'https://jokes.farcaster.app',
-  icons: ['https://jokes.farcaster.app/icon.png']
+  url: process.env.NEXT_PUBLIC_APP_URL || 'https://jokes.farcaster.app',
+  icons: [process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '')}/icon.png` : 'https://jokes.farcaster.app/icon.png']
 }
 
 // Create Wagmi Adapter
@@ -41,6 +41,17 @@ const celoSepolia: AppKitNetwork = ({
 } as unknown) as AppKitNetwork
 
 export const networks = [celoSepolia, celoMainnet] as [AppKitNetwork, ...AppKitNetwork[]]
+
+// Export a wagmi-compatible chain object for Celo Sepolia so consumers can register it with wagmi
+export const celoSepoliaChain = {
+  id: 11142220,
+  name: 'Celo Sepolia',
+  network: 'celo-sepolia',
+  nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
+  rpcUrls: { default: { http: [CELO_SEPOLIA_RPC || 'https://rpc.ankr.com/celo_sepolia'] } },
+  blockExplorers: { default: { name: 'Celo Explorer', url: 'https://explorer.celo.org/sepolia' } },
+  contracts: undefined,
+} as const
 
 export const wagmiAdapter = new WagmiAdapter({
   storage: (createStorage({
