@@ -1,0 +1,12 @@
+{
+  "network": "sepolia",
+  "rpc": "https://rpc.ankr.com/celo_sepolia",
+  "contracts": {
+    "PunnyPower": {
+      "address": "0x66Fa8f57bbe89dd5c70044fC0318641b280143AD"
+    },
+    "QuestRegistry": {
+      "address": "0xBF22B2026Bd97D56515af04Ed97EB5552f269180"
+    }
+  }
+}

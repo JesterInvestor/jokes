@@ -61,6 +61,8 @@ export default function Quests() {
 
           {loading ? (
             <div className="text-center text-gray-400 py-8">Loading quests...</div>
+          ) : quests.length === 0 ? (
+            <div className="text-center text-gray-400 py-8">No quests found. Ensure <code>NEXT_PUBLIC_QUEST_REGISTRY_ADDRESS</code> is set in your environment.</div>
           ) : (
             quests.map((quest) => (
               <div key={quest.id} className="bg-white/5 rounded-2xl p-6">
