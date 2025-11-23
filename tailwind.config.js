@@ -8,13 +8,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        brand: {
-          magenta: '#B7239B',
-          pink: '#ED3DD6',
-          yellow: '#FFE91A',
-          orange: '#FE5700',
-          red: '#EA1104',
-        },
+        // Removed vivid brand colors to favor a muted paper palette
         paper: {
           duststorm: '#DFD0B9',
           alabaster: '#EDEDE7',

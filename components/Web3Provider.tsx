@@ -77,6 +77,25 @@ function NetworkGuard({ children }: { children: ReactNode }) {
 }
 
 export function Web3Provider({ children }: { children: ReactNode }) {
+  // Attempt to notify Farcaster Mini App host that our app is ready.
+  // Some miniapp hosts inject an SDK on `window` (or expose it via other globals).
+  // Calling `sdk.actions.ready()` hides the splash screen. This is intentionally
+  // defensive: we only call it if an SDK is present so builds won't break.
+  React.useEffect(() => {
+    try {
+      const maybeSdk = (window as any).sdk || (window as any).farcaster || (window as any).Farcaster || (window as any).__farcaster_sdk || (window as any).miniAppSdk
+      if (maybeSdk && maybeSdk.actions && typeof maybeSdk.actions.ready === 'function') {
+        // call and ignore result
+        maybeSdk.actions.ready().catch((e: any) => console.warn('farcaster sdk ready() rejected', e))
+      } else {
+        // If the global SDK isn't available, try to find common aliases on window
+        // or leave it to the host. No-op if nothing found.
+      }
+    } catch (e) {
+      console.warn('Error while attempting to call Farcaster sdk.ready()', e)
+    }
+  }, [])
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
