@@ -15,6 +15,13 @@ module.exports = {
           orange: '#FE5700',
           red: '#EA1104',
         },
+        paper: {
+          duststorm: '#DFD0B9',
+          alabaster: '#EDEDE7',
+          champagne: '#F3E1D4',
+          duststorm2: '#E8D3BE',
+          darkvanilla: '#D9C2A6',
+        },
       },
       animation: {
         'float': 'float 3s ease-in-out infinite',

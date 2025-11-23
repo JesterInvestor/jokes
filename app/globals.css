@@ -3,24 +3,19 @@
 @tailwind utilities;
 
 :root {
-  /* Cinema retro palette (provided) */
-  --brand-magenta: #B7239B;
-  --brand-pink: #ED3DD6;
-  --brand-yellow: #FFE91A;
-  --brand-orange: #FE5700;
-  --brand-red: #EA1104;
-
-  /* Background base colors */
-  --bg-900: #040007; /* near-black purple */
-  --bg-800: #0f0210; /* deep purple */
+  /* Natural Paper Color Scheme */
+  --color-dust-storm: #DFD0B9;
+  --color-alabaster: #EDEDE7;
+  --color-champagne-pink: #F3E1D4;
+  --color-dust-storm-2: #E8D3BE;
+  --color-dark-vanilla: #D9C2A6;
 }
 
 body {
-  @apply text-white;
-  background: radial-gradient(1000px 400px at 10% 10%, rgba(183,35,155,0.15), transparent 10%),
-              radial-gradient(800px 300px at 90% 80%, rgba(237,61,214,0.12), transparent 10%),
-              linear-gradient(180deg, var(--bg-800), var(--bg-900));
-  background-attachment: fixed;
+  color: var(--color-dust-storm);
+  background-color: var(--color-alabaster);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Custom scrollbar */
@@ -33,12 +28,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--brand-pink), var(--brand-magenta));
+  background: linear-gradient(180deg, var(--color-champagne-pink), var(--color-dust-storm));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--brand-magenta), var(--brand-pink));
+  background: linear-gradient(180deg, var(--color-dust-storm), var(--color-champagne-pink));
 }
 
 /* Glowing effect utility */
