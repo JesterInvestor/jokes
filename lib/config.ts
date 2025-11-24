@@ -24,14 +24,6 @@ export const metadata = {
 const CELO_MAINNET_RPC = process.env.CELO_MAINNET_RPC || process.env.RPC_URL || 'https://forno.celo.org'
 const CELO_SEPOLIA_RPC = process.env.CELO_SEPOLIA_RPC || process.env.RPC_URL || process.env.CELO_ALFAJORES_RPC || ''
 
-const celoMainnet: AppKitNetwork = ({
-  id: 'celo-mainnet',
-  name: 'Celo Mainnet',
-  chainId: 42220,
-  rpcUrl: CELO_MAINNET_RPC,
-  nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
-} as unknown) as AppKitNetwork
-
 const celoSepolia: AppKitNetwork = ({
   id: 'celo-sepolia',
   name: 'Celo Sepolia',
@@ -39,8 +31,9 @@ const celoSepolia: AppKitNetwork = ({
   rpcUrl: CELO_SEPOLIA_RPC || 'https://rpc.ankr.com/celo_sepolia',
   nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
 } as unknown) as AppKitNetwork
-
-export const networks = [celoSepolia, celoMainnet] as [AppKitNetwork, ...AppKitNetwork[]]
+// Only expose the test network (Celo Sepolia) so the wallet/appkit
+// network switcher offers the single supported chain.
+export const networks = [celoSepolia] as [AppKitNetwork, ...AppKitNetwork[]]
 
 // Export a wagmi-compatible chain object for Celo Sepolia so consumers can register it with wagmi
 export const celoSepoliaChain = {
