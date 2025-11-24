@@ -34,7 +34,18 @@ export function useQuests(contractAddress?: string) {
   const [loading, setLoading] = useState(true)
 
   const refresh = useCallback(async () => {
-    const addr = contractAddress || process.env.NEXT_PUBLIC_QUEST_REGISTRY_ADDRESS
+    let addr = contractAddress || process.env.NEXT_PUBLIC_QUEST_REGISTRY_ADDRESS
+    // If env var not set (e.g., running in an environment without NEXT_PUBLIC_*),
+    // try to fall back to the local deployments file created by the deploy script.
+    if (!addr) {
+      try {
+        // dynamic import so this works both server- and client-side when bundled
+        const dep = await import('../deployments/sepolia.json')
+        addr = (dep?.contracts as any)?.QuestRegistry?.address || (dep?.default as any)?.contracts?.QuestRegistry?.address
+      } catch (e) {
+        // ignore — we'll handle missing addr below
+      }
+    }
     if (!addr) {
       setQuests([])
       setLoading(false)
@@ -84,7 +95,13 @@ export function useQuests(contractAddress?: string) {
   }, [refresh])
 
   const claim = useCallback(async (questId: number) => {
-    const addr = contractAddress || process.env.NEXT_PUBLIC_QUEST_REGISTRY_ADDRESS
+    let addr = contractAddress || process.env.NEXT_PUBLIC_QUEST_REGISTRY_ADDRESS
+    if (!addr) {
+      try {
+        const dep = await import('../deployments/sepolia.json')
+        addr = (dep?.contracts as any)?.QuestRegistry?.address || (dep?.default as any)?.contracts?.QuestRegistry?.address
+      } catch (e) {}
+    }
     if (!addr) throw new Error('QuestRegistry address not configured')
     if (!isConnected) throw new Error('wallet not connected')
     if (typeof window === 'undefined' || !(window as any).ethereum) throw new Error('no signer available')

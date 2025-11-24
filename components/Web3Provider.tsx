@@ -2,7 +2,6 @@
 
 import React, { ReactNode, useEffect } from 'react'
 import { WagmiProvider, useAccount, useDisconnect } from 'wagmi'
-import NetworkSwitcher from './NetworkSwitcher'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { config, queryClient, networks } from '@/lib/config'
 
@@ -107,7 +106,6 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <NetworkGuard>
           <div style={{ position: 'relative' }}>
-            <NetworkSwitcher />
             {children}
           </div>
         </NetworkGuard>
